@@ -20,15 +20,15 @@ LDFLAGS = -nostdlib --fatal-warnings --gc-sections
 # FIXME: suppress warning about RWX SRAM:
 LDFLAGS += --no-warn-rwx-segment
 
-CCFLAGS += -Icommon/include \
+CCFLAGS += -Icommon/include
 
-VPATH += src crt
+VPATH += src crt common/src
 
 all:
 	@echo "Examples: test1 test2 test3"
 
 TEST1_ASRCS := start1.S
-TEST1_CSRCS := test1.c
+TEST1_CSRCS := test1.c htif.c
 TEST1_OBJS := $(patsubst %, $(BUILD)/%, $(TEST1_ASRCS:.S=.o))
 TEST1_OBJS += $(patsubst %, $(BUILD)/%, $(TEST1_CSRCS:.c=.o))
 TEST1_LDS := ld/spike.ld

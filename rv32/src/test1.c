@@ -1,27 +1,24 @@
 #include <stdint.h>
 
-volatile uint64_t tohost;
-volatile uint64_t fromhost;
+#include "htif.h"
 
 void trap_handler(void) __attribute__((interrupt("machine")));
 
 void trap_handler(void)
 {
 	while (1) {
-		__asm__ volatile ("nop");
-		__asm__ volatile ("nop");
 		__asm__ volatile ("wfi");
 	}
 }
 
+static void print(const char *s)
+{
+	while (*s)
+		htif_putc(*s++);
+}
+
 int main(void)
 {
-	volatile int c = 1, d = 1;
-
-	while (c++) {
-		tohost = c;
-		d = fromhost;
-	}
-
-	return (int)d;
+	print("hello world\n");
+	htif_exit(10);
 }
