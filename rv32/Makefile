@@ -28,14 +28,14 @@ all:
 	@echo "Examples: test1 test2 test3"
 
 TEST1_ASRCS := start1.S
-TEST1_CSRCS := test1.c htif.c
+TEST1_CSRCS := test1.c htif.c xprintf.c stdlib.c
 TEST1_OBJS := $(patsubst %, $(BUILD)/%, $(TEST1_ASRCS:.S=.o))
 TEST1_OBJS += $(patsubst %, $(BUILD)/%, $(TEST1_CSRCS:.c=.o))
 TEST1_LDS := ld/spike.ld
 
 test1: $(TEST1_LDS) $(TEST1_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	$(SPIKE) -d --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
+	#$(SPIKE) --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
 
 # common
 
@@ -49,7 +49,7 @@ $(BUILD)/%.o: %.c | $(BUILD)
 	$(CC) $(OPTS) $(CCFLAGS) -c $< -o $@
 
 tags:
-	ctags -a -R src crt
+	ctags -a -R src crt common
 
 clean:
 	rm -rf $(BUILD)

@@ -1,5 +1,6 @@
 #include <stdint.h>
 
+#include "xprintf.h"
 #include "htif.h"
 
 void trap_handler(void) __attribute__((interrupt("machine")));
@@ -11,14 +12,13 @@ void trap_handler(void)
 	}
 }
 
-static void print(const char *s)
-{
-	while (*s)
-		htif_putc(*s++);
-}
-
 int main(void)
 {
-	print("hello world\n");
+	xdev_out(htif_putc);
+
+	for (int i = 0; i < 10; i++) {
+		xprintf("%s: count: %x\n", __func__, i);
+	}
+
 	htif_exit(10);
 }
