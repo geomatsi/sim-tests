@@ -14,29 +14,26 @@ _start:
 	la sp, _estack
 	la s0, _estack
 
-#	/* clear bss section */
-#	la a0, _sbss
-#	la a1, _ebss
-#	bgeu a0, a1, 2f
-#1:
-#	sw zero, (a0)
-#	addi a0, a0, 4
-#	bltu a0, a1, 1b
-#2:
-#	/* fill stack region with 0xaa canaries */
-#	la a0, _sstack
-#	la a1, _estack
-#	bgeu a0, a1, 2f
-#	li t0, 0xaaaaaaaa
-#1:
-#	sw t0, (a0)
-#	addi a0, a0, 4
-#	bltu a0, a1, 1b
-#2:
-	/* setup mtvec:
-         * - low bits are hardwired to 0xc0
-         * - higher bits be changed to fit eeprom/sram/spifi
-         */
+	/* clear bss section */
+	la a0, _sbss
+	la a1, _ebss
+	bgeu a0, a1, 2f
+1:
+	sw zero, (a0)
+	addi a0, a0, 4
+	bltu a0, a1, 1b
+2:
+	/* fill stack region with 0xaa canaries */
+	la a0, _sstack
+	la a1, _estack
+	bgeu a0, a1, 2f
+	li t0, 0xaaaaaaaa
+1:
+	sw t0, (a0)
+	addi a0, a0, 4
+	bltu a0, a1, 1b
+2:
+	/* setup mtvec */
 	la t0, trap_entry
 	csrw mtvec, t0
 

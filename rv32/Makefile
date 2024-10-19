@@ -27,6 +27,10 @@ VPATH += src crt common/src
 all:
 	@echo "Examples: test1 test2 test3"
 
+#
+# test1
+#
+
 TEST1_ASRCS := start1.S
 TEST1_CSRCS := test1.c htif.c xprintf.c stdlib.c
 TEST1_OBJS := $(patsubst %, $(BUILD)/%, $(TEST1_ASRCS:.S=.o))
@@ -34,6 +38,20 @@ TEST1_OBJS += $(patsubst %, $(BUILD)/%, $(TEST1_CSRCS:.c=.o))
 TEST1_LDS := ld/spike.ld
 
 test1: $(TEST1_LDS) $(TEST1_OBJS)
+	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
+	#$(SPIKE) --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
+
+#
+# test2
+#
+
+TEST2_ASRCS := start1.S
+TEST2_CSRCS := test2.c htif.c xprintf.c stdlib.c
+TEST2_OBJS := $(patsubst %, $(BUILD)/%, $(TEST2_ASRCS:.S=.o))
+TEST2_OBJS += $(patsubst %, $(BUILD)/%, $(TEST2_CSRCS:.c=.o))
+TEST2_LDS := ld/spike.ld
+
+test2: $(TEST2_LDS) $(TEST2_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
 	#$(SPIKE) --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
 
