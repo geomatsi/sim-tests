@@ -6,6 +6,7 @@
 #define XPRINTF_DEF
 
 #include <stdlib.h>
+#include <string.h>
 
 #ifdef __cplusplus
 extern "C" {
