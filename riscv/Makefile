@@ -26,7 +26,7 @@ endif
 
 ASFLAGS = -march=$(RISCV_ISA)
 
-CCFLAGS = -march=$(RISCV_ISA) -mabi=$(RISCV_ABI)
+CCFLAGS = -march=$(RISCV_ISA) -mabi=$(RISCV_ABI) -mcmodel=medany
 CCFLAGS += -ffunction-sections -fdata-sections -ffreestanding -fno-stack-protector
 CCFLAGS += -Wall -Wextra -Werror -O2 -std=gnu99
 
@@ -53,7 +53,7 @@ TEST1_LDS := ld/spike.ld
 
 test1: $(TEST1_LDS) $(TEST1_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	echo $(SPIKE) --isa=$(RISCV_ISA) -m0x20000:0x80000 $(BUILD)/$@.elf
+	echo $(SPIKE) --isa=$(RISCV_ISA) $(BUILD)/$@.elf
 
 #
 # test2
@@ -67,7 +67,7 @@ TEST2_LDS := ld/spike.ld
 
 test2: $(TEST2_LDS) $(TEST2_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	echo $(SPIKE) --isa=$(RISCV_ISA) -m0x20000:0x80000 $(BUILD)/$@.elf
+	echo $(SPIKE) --isa=$(RISCV_ISA) $(BUILD)/$@.elf
 
 #
 # test3
@@ -81,7 +81,7 @@ TEST3_LDS := ld/spike.ld
 
 test3: $(TEST3_LDS) $(TEST3_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	echo $(SPIKE) --real-time-clint --isa=$(RISCV_ISA) -m0x20000:0x80000 $(BUILD)/$@.elf
+	echo $(SPIKE) --real-time-clint --isa=$(RISCV_ISA) $(BUILD)/$@.elf
 
 # common
 
