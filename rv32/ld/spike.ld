@@ -1,4 +1,3 @@
-OUTPUT_FORMAT("elf32-littleriscv")
 OUTPUT_ARCH(riscv)
 
 MEMORY

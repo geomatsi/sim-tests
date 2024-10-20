@@ -1,16 +1,13 @@
 #include <stdint.h>
 
+#include "riscv_encoding.h"
 #include "xprintf.h"
 #include "htif.h"
 
-#define CLINT_BASE    (0x02000000UL)
-#define REG_MSWI0     ((volatile uint32_t *)(CLINT_BASE + 0x00000000UL))
-#define REG_MTIME     ((volatile uint32_t *)(CLINT_BASE + 0x0000bff8UL))
-#define REG_MTIMECMP  ((volatile uint32_t *)(CLINT_BASE + 0x00004000UL))
-
-#define MSTATUS_MIE   (1UL << 3)
-#define MIE_MSIE      (1UL << 3)
-#define MIE_MTIE      (1UL << 7)
+#define CLINT_BASE        (0x02000000UL)
+#define REG_MSWI0         ((volatile unsigned long*)(CLINT_BASE + 0x00000000UL))
+#define REG_MTIME         ((volatile unsigned long*)(CLINT_BASE + 0x0000bff8UL))
+#define REG_MTIMECMP      ((volatile unsigned long*)(CLINT_BASE + 0x00004000UL))
 
 void trap_handler(void) __attribute__((interrupt("machine")));
 
@@ -26,14 +23,14 @@ void trap_handler(void)
 		: "=r" (mepc) : : );
 
 	switch (mcause) {
-		case 0x80000003UL:
+		case (MCAUSE_IRQ_MASK | IRQ_M_SOFT):
 			xprintf("%s: machine software interrupt: 0x%lx\n",
 				__func__, mcause);
-			__asm__ volatile ("csrsi mstatus, %0" : : "K"(MSTATUS_MIE) : "memory");
+			//__asm__ volatile ("csrsi mstatus, %0" : : "K"(MSTATUS_MIE) : "memory");
 			*REG_MSWI0 = 0x1;
 			while (1);
 			break;
-		case 0x80000007UL:
+		case (MCAUSE_IRQ_MASK | IRQ_M_TIMER):
 			xprintf("%s: machine timer interrupt: 0x%lx\n",
 				__func__, mcause);
 			//*REG_MTIMECMP = (-1UL);

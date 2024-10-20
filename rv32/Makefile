@@ -2,7 +2,8 @@
 #
 #
 
-CROSS_COMPILE ?= riscv32-unknown-elf-
+CROSS_COMPILE ?= riscv64-unknown-elf-
+RISCV_XLEN ?= 64
 
 CP = $(CROSS_COMPILE)objcopy
 CC = $(CROSS_COMPILE)gcc
@@ -13,15 +14,28 @@ SPIKE ?= spike
 
 BUILD ?= build
 
-ASFLAGS = -march=rv32imac_zicsr_zifencei
-CCFLAGS = -march=rv32imac_zicsr_zifencei -mabi=ilp32 -std=gnu99 -ffunction-sections -fdata-sections -ffreestanding -Wall -Wextra -Werror -fno-stack-protector -O2
-LDFLAGS = -nostdlib --fatal-warnings --gc-sections
+ifeq ($(RISCV_XLEN), 64)
+	RISCV_ABI = lp$(RISCV_XLEN)
+	RISCV_ELF = elf$(RISCV_XLEN)lriscv
+	RISCV_ISA = rv$(RISCV_XLEN)imac_zicsr_zifencei
+else
+	RISCV_ABI = ilp$(RISCV_XLEN)
+	RISCV_ELF = elf$(RISCV_XLEN)lriscv
+	RISCV_ISA = rv$(RISCV_XLEN)imac_zicsr_zifencei
+endif
 
+ASFLAGS = -march=$(RISCV_ISA)
+
+CCFLAGS = -march=$(RISCV_ISA) -mabi=$(RISCV_ABI)
+CCFLAGS += -ffunction-sections -fdata-sections -ffreestanding -fno-stack-protector
+CCFLAGS += -Wall -Wextra -Werror -O2 -std=gnu99
+
+LDFLAGS = -m $(RISCV_ELF)
+LDFLAGS += -nostdlib --fatal-warnings --gc-sections
 # FIXME: suppress warning about RWX SRAM:
 LDFLAGS += --no-warn-rwx-segment
 
 CCFLAGS += -Icommon/include
-
 VPATH += src crt common/src
 
 all:
@@ -39,7 +53,7 @@ TEST1_LDS := ld/spike.ld
 
 test1: $(TEST1_LDS) $(TEST1_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	#$(SPIKE) --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
+	echo $(SPIKE) --isa=$(RISCV_ISA) -m0x20000:0x80000 $(BUILD)/$@.elf
 
 #
 # test2
@@ -53,7 +67,7 @@ TEST2_LDS := ld/spike.ld
 
 test2: $(TEST2_LDS) $(TEST2_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	#$(SPIKE) --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
+	echo $(SPIKE) --isa=$(RISCV_ISA) -m0x20000:0x80000 $(BUILD)/$@.elf
 
 #
 # test3
@@ -67,7 +81,7 @@ TEST3_LDS := ld/spike.ld
 
 test3: $(TEST3_LDS) $(TEST3_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
-	#$(SPIKE) --real-time-clint --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
+	echo $(SPIKE) --real-time-clint --isa=$(RISCV_ISA) -m0x20000:0x80000 $(BUILD)/$@.elf
 
 # common
 
