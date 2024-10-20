@@ -55,6 +55,20 @@ test2: $(TEST2_LDS) $(TEST2_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
 	#$(SPIKE) --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
 
+#
+# test3
+#
+
+TEST3_ASRCS := start1.S
+TEST3_CSRCS := test3.c htif.c xprintf.c stdlib.c
+TEST3_OBJS := $(patsubst %, $(BUILD)/%, $(TEST3_ASRCS:.S=.o))
+TEST3_OBJS += $(patsubst %, $(BUILD)/%, $(TEST3_CSRCS:.c=.o))
+TEST3_LDS := ld/spike.ld
+
+test3: $(TEST3_LDS) $(TEST3_OBJS)
+	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
+	#$(SPIKE) --real-time-clint --isa=rv32imac_zicsr_zifencei -m0x20000:0x80000 $(BUILD)/$@.elf
+
 # common
 
 $(BUILD):
