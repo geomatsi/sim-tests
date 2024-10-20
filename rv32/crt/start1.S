@@ -47,7 +47,7 @@ _start:
 
 	.section .trap, "ax", @progbits
 	.weak trap_handler
-	.align 1
+	.align 4
 
 trap_entry:
 	j trap_handler
