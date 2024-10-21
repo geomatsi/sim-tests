@@ -10,6 +10,8 @@
 #ifndef __RISCV_ENCODING_H__
 #define __RISCV_ENCODING_H__
 
+#define BIT(n)                          (1UL << (n))
+
 #define CAUSE_MISALIGNED_FETCH          0x0
 #define CAUSE_FETCH_ACCESS              0x1
 #define CAUSE_ILLEGAL_INSTRUCTION       0x2
@@ -32,7 +34,14 @@
 
 #define MCAUSE_IRQ_MASK                 (1UL << (__riscv_xlen - 1))
 
+#define MSTATUS_SIE                     (1UL << 1)
 #define MSTATUS_MIE                     (1UL << 3)
+#define MSTATUS_SPIE                    (1UL << 5)
+#define MSTATUS_MPIE                    (1UL << 7)
+#define MSTATUS_SPP                     (1UL << 8)
+#define MSTATUS_MPP_SHIFT               11
+#define MSTATUS_MPP                     (3UL << MSTATUS_MPP_SHIFT)
+
 #define MIE_MSIE                        (1UL << 3)
 #define MIE_MTIE                        (1UL << 7)
 
