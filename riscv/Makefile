@@ -39,7 +39,7 @@ CCFLAGS += -Icommon/include
 VPATH += src crt common/src
 
 all:
-	@echo "Examples: test1 test2 test3"
+	@echo "Examples: test1 test2 test3 test4"
 
 #
 # test1
@@ -80,6 +80,20 @@ TEST3_OBJS += $(patsubst %, $(BUILD)/%, $(TEST3_CSRCS:.c=.o))
 TEST3_LDS := ld/spike.ld
 
 test3: $(TEST3_LDS) $(TEST3_OBJS)
+	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
+	echo $(SPIKE) --real-time-clint --isa=$(RISCV_ISA) $(BUILD)/$@.elf
+
+#
+# test4
+#
+
+TEST4_ASRCS := start1.S
+TEST4_CSRCS := test4.c htif.c xprintf.c stdlib.c
+TEST4_OBJS := $(patsubst %, $(BUILD)/%, $(TEST4_ASRCS:.S=.o))
+TEST4_OBJS += $(patsubst %, $(BUILD)/%, $(TEST4_CSRCS:.c=.o))
+TEST4_LDS := ld/spike.ld
+
+test4: $(TEST4_LDS) $(TEST4_OBJS)
 	$(LD) $(LDFLAGS) -T$< $(filter-out $<, $^) -o $(BUILD)/$@.elf
 	echo $(SPIKE) --real-time-clint --isa=$(RISCV_ISA) $(BUILD)/$@.elf
 
