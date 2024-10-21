@@ -34,8 +34,12 @@ _start:
 	bltu a0, a1, 1b
 2:
 	/* setup mtvec */
-	la t0, trap_entry
+	la t0, m_trap_entry
 	csrw mtvec, t0
+
+	/* setup stvec */
+	la t0, s_trap_entry
+	csrw stvec, t0
 
 	/* main */
 	jal main
@@ -45,14 +49,26 @@ _start:
 	wfi
 	j 1b
 
-	.section .trap, "ax", @progbits
-	.weak trap_handler
+	.section .init, "ax", @progbits
+	.weak m_trap_handler
 	.align 4
 
-trap_entry:
-	j trap_handler
+m_trap_entry:
+	j m_trap_handler
 
-trap_handler:
+m_trap_handler:
+1:
+	wfi
+	j 1b
+
+	.section .init, "ax", @progbits
+	.weak s_trap_handler
+	.align 4
+
+s_trap_entry:
+	j s_trap_handler
+
+s_trap_handler:
 1:
 	wfi
 	j 1b

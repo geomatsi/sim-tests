@@ -5,9 +5,8 @@
 
 #define ILL_INSN (0x00000000)
 
-void trap_handler(void) __attribute__((interrupt("machine")));
-
-void trap_handler(void)
+void m_trap_handler(void) __attribute__((interrupt("machine")));
+void m_trap_handler(void)
 {
 	unsigned long mcause, mtval, mepc;
 	int ret = 0;
