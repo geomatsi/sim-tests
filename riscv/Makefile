@@ -88,7 +88,7 @@ test3: $(TEST3_LDS) $(TEST3_OBJS)
 #
 
 TEST4_ASRCS := start1.S
-TEST4_CSRCS := test4.c htif.c xprintf.c stdlib.c
+TEST4_CSRCS := test4.c htif.c xprintf.c stdlib.c opcodes.c
 TEST4_OBJS := $(patsubst %, $(BUILD)/%, $(TEST4_ASRCS:.S=.o))
 TEST4_OBJS += $(patsubst %, $(BUILD)/%, $(TEST4_CSRCS:.c=.o))
 TEST4_LDS := ld/spike.ld

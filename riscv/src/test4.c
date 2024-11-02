@@ -3,13 +3,14 @@
 #include "riscv_encoding.h"
 #include "riscv_csr.h"
 #include "xprintf.h"
+#include "opcodes.h"
 #include "aclint.h"
 #include "htif.h"
 
 void illegal(void)
 {
 #define ILL_INSN (0x0U)
-	__asm__ volatile (".word %0" : : "i"(ILL_INSN) : );
+	__asm__ volatile (".half %0" : : "i"(ILL_INSN) : );
 }
 
 void ebreak(void)
@@ -38,19 +39,19 @@ void m_trap_handler(void)
 
 	switch (mcause) {
 		case CAUSE_ILLEGAL_INSTRUCTION:
-			xprintf("%s: illegal instruction: 0x%lx\n",
-					__func__, mcause);
-			step_over = 4; /* illegal insn size */
+			step_over = insn_len(mepc);
+			xprintf("%s: illegal instruction: mcause(0x%lx) len(%d)\n",
+					__func__, mcause, step_over);
 			break;
 		case CAUSE_BREAKPOINT: 
-			xprintf("%s: breakpoint exception: 0x%lx\n",
-				__func__, mcause);
-			step_over = 2; /* ebreak insn size */
+			step_over = insn_len(mepc);
+			xprintf("%s: breakpoint exception: mcause(0x%lx) len(%d)\n",
+				__func__, mcause, step_over);
 			break;
 		case CAUSE_SUPERVISOR_ECALL: 
-			xprintf("%s: supervisor ecall exception: 0x%lx\n",
-				__func__, mcause);
-			step_over = 4; /* ecall insn size */
+			step_over = insn_len(mepc);
+			xprintf("%s: supervisor ecall exception: mcause(0x%lx) len(%d)\n",
+				__func__, mcause, step_over);
 			break;
 		default:
 			xprintf("%s: unexpected exception: 0x%lx\n",
@@ -59,10 +60,6 @@ void m_trap_handler(void)
 			break;
 	}
 
-	/* Note:
-	 * - for simplicity we explicitly set jump size for known insn
-	 * - proper code should decode insn and figure out its size
-	 */
 	if (step_over) {
 		__asm__ volatile (
 			"csrr %0, mepc\n\t"
@@ -91,9 +88,9 @@ void s_trap_handler(void)
 
 	switch (scause) {
 		case CAUSE_ILLEGAL_INSTRUCTION:
-			xprintf("%s: illegal instruction: 0x%lx\n",
-					__func__, scause);
-			step_over = 4; /* illegal insn size */
+			step_over = insn_len(sepc);
+			xprintf("%s: illegal instruction: scause(0x%lx) len(%d)\n",
+					__func__, scause, step_over);
 
 			/*
 			 * problem:
@@ -110,9 +107,9 @@ void s_trap_handler(void)
 
 			break;
 		case CAUSE_BREAKPOINT: 
-			xprintf("%s: breakpoint exception: 0x%lx\n",
-				__func__, scause);
-			step_over = 2; /* ebreak insn size */
+			step_over = insn_len(sepc);
+			xprintf("%s: breakpoint exception: scause(0x%lx) len(%d)\n",
+				__func__, scause, step_over);
 			/* no problems:
 			 * - ecall will trap into m-handler
 			 * - m-handler uses mepc, so sepc will not be rewritten
@@ -129,10 +126,6 @@ void s_trap_handler(void)
 			break;
 	}
 
-	/* Note:
-	 * - for simplicity we explicitly set jump size for known insn
-	 * - proper code should decode insn and figure out its size
-	 */
 	if (step_over) {
 		__asm__ volatile (
 			"csrr %0, sepc\n\t"
